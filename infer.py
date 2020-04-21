@@ -16,9 +16,9 @@ img_path = 'test'
 threshold = 0.2
 iou_threshold = 0.2
 
-use_cuda = False
-use_float16 = True
-cudnn.fastest = False
+use_cuda = True
+use_float16 = False
+cudnn.fastest = True
 cudnn.benchmark = True
 
 def display(preds, imgs, imshow=True, imwrite=False):
@@ -41,7 +41,7 @@ def display(preds, imgs, imshow=True, imwrite=False):
             cv2.waitKey(0)
 
         if imwrite:
-            cv2.imwrite('result/img_inferred_d{compound_coef}_this_repo_%d.jpg'%i, imgs[i])
+            cv2.imwrite('result/img_inferred_d%d_this_repo_%d.jpg'%(compound_coef, i), imgs[i])
 
 obj_list = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
             'fire hydrant', '', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep',
@@ -67,7 +67,7 @@ else:
 x = x.to(torch.float32 if not use_float16 else torch.float16).permute(0, 3, 1, 2)
 
 model = EfficientDetBackbone(compound_coef=compound_coef, num_classes=len(obj_list))
-model.load_state_dict(torch.load('weights/efficientdet-d0.pth'))
+model.load_state_dict(torch.load('weights/efficientdet-d%d.pth'%compound_coef))
 model.requires_grad_(False)
 model.eval()
 
@@ -93,9 +93,9 @@ with torch.no_grad():
 print('running speed test...')
 with torch.no_grad():
     print('test1: model inferring and postprocessing')
-    print('inferring image for 10 times...')
+    print('inferring image for 100 times...')
     t1 = time.time()
-    for _ in range(100):
+    for _ in range(1000):
         _, regression, classification, anchors = model(x)
 
         out = postprocess(x,
@@ -103,11 +103,10 @@ with torch.no_grad():
                           regressBoxes, clipBoxes,
                           threshold, iou_threshold)
         out = invert_affine(framed_metas, out)
-
-        print("s")
+        print("Now dealing width images")
 
     t2 = time.time()
-    tact_time = (t2 - t1) / 100.
+    tact_time = (t2 - t1) / 1000.
     print('{tact_time} seconds, {%f} FPS, @batch_size 1'%(1. / tact_time))
 
     # uncomment this if you want a extreme fps test

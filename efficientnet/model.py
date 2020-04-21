@@ -208,12 +208,14 @@ class EfficientNet(nn.Module):
 
     @classmethod
     def from_name(cls, model_name, override_params=None):
+        model_name = "efficientnet-b0"
         cls._check_model_name_is_valid(model_name)
         blocks_args, global_params = get_model_params(model_name, override_params)
         return cls(blocks_args, global_params)
 
     @classmethod
     def from_pretrained(cls, model_name, load_weights=True, advprop=True, num_classes=1000, in_channels=3):
+        model_name = "efficientnet-b0"
         model = cls.from_name(model_name, override_params={'num_classes': num_classes})
         if load_weights:
             load_pretrained_weights(model, model_name, load_fc=(num_classes == 1000), advprop=advprop)
@@ -225,13 +227,13 @@ class EfficientNet(nn.Module):
 
     @classmethod
     def get_image_size(cls, model_name):
+        model_name = "efficientnet-b0"
         cls._check_model_name_is_valid(model_name)
         _, _, res, _ = efficientnet_params(model_name)
         return res
 
     @classmethod
     def _check_model_name_is_valid(cls, model_name):
-        model_name = "efficientnet-b0"
         """ Validates model name. """
         valid_models = ['efficientnet-b'+str(i) for i in range(9)]
         if model_name not in valid_models:

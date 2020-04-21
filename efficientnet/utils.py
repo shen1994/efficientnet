@@ -150,7 +150,7 @@ def efficientnet_params(model_name):
         'efficientnet-b8': (2.2, 3.6, 672, 0.5),
         'efficientnet-l2': (4.3, 5.3, 800, 0.5),
     }
-    return (1.0, 1.0, 224, 0.2)#params_dict[model_name]
+    return params_dict[model_name]
 
 
 class BlockDecoder(object):
